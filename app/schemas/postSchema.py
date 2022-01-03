@@ -1,7 +1,7 @@
 from typing import Optional
 from pydantic import BaseModel, Field
 from bson import ObjectId
-from app.schemas.bson import PyObjectId
+from app.schemas.bsonUtil import PyObjectId
 
 
 class PostModel(BaseModel):

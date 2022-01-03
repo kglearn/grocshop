@@ -1,8 +1,16 @@
-from typing import Optional
-from pydantic import BaseModel, Field, EmailStr
-from bson import ObjectId
-from app.schemas.bson import PyObjectId
+from typing import Optional, List
+from pydantic import BaseModel, Field, EmailStr, ValidationError
 from datetime import datetime
+from enum import Enum
+from bson import ObjectId
+from app.schemas.bsonUtil import PyObjectId
+
+class UserType(str, Enum):
+    admin = "admin"
+    customer = "customer"
+    shopOwner = "shopOwner"
+    shopAdmin = "shopAdmin"
+
 
 class UserBase(BaseModel):
     id: EmailStr = Field(default_factory=EmailStr, alias="_id")
@@ -10,7 +18,6 @@ class UserBase(BaseModel):
     class Config:
         allow_population_by_field_name = True
         arbitrary_types_allowed = True
-        json_encoders = {ObjectId:str}
         schema_extra = {
             "example": {
                 "_id": "61d1bf9669654465394034fa",
@@ -24,7 +31,6 @@ class UserResponseModel(UserBase):
 
     class Config:
         arbitrary_types_allowed = True
-        json_encoders = {ObjectId: str}
         schema_extra = {
             "example": {
                 "_id": "john.doe@example.com",
@@ -34,11 +40,10 @@ class UserResponseModel(UserBase):
 
 class UserCreateModel(UserBase):
     password: str = Field(...)
-    type: str = Field(...)
+    type: UserType = Field(...)
 
     class Config:
         arbitrary_types_allowed = True
-        json_encoders = {ObjectId: str}
         schema_extra = {
             "example": {
                 "_id": "john.doe@example.com",
@@ -46,3 +51,6 @@ class UserCreateModel(UserBase):
             }
         }
 
+
+if __name__ == "__main__":
+    print(UserCreateModel.schema_json(indent=2))

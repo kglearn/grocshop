@@ -1,5 +1,5 @@
 from typing import Optional, List
-from fastapi import APIRouter, Body, status
+from fastapi import APIRouter, Body, status, Security
 from fastapi.exceptions import HTTPException
 from fastapi.params import Depends
 from fastapi.encoders import jsonable_encoder
@@ -19,10 +19,11 @@ router = APIRouter(
 
 
 @router.get("/", response_model=List[us.UserResponseModel], status_code=status.HTTP_200_OK , response_description="Get all users")
-async def getAllUsers(db: AsyncIOMotorDatabase = Depends(getDB), currentUser: int = Depends(oauth2.getCurrentUser)):
+# async def getAllUsers(db: AsyncIOMotorDatabase = Depends(getDB), currentUser: int = Depends(oauth2.getCurrentUser)):
+async def getAllUsers(db: AsyncIOMotorDatabase = Depends(getDB), currentUser: us.UserCreateModel = Security(oauth2.getCurrentUser, scopes=["admin"])):
     print(currentUser)
-    if currentUser["type"] != "admin":
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not permitted for this operation")
+    # if currentUser["type"] != "admin":
+    #     raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not permitted for this operation")
     users = await db.users.find().to_list(length=None)
     return users
 

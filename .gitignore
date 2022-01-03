@@ -3,3 +3,5 @@ __pycache__
 app/__pycache__
 app/routers/__pycache__
 app/schemas/__pycache__
+app/*/*bkp
+app/*bkp

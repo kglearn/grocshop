@@ -1,5 +1,5 @@
 from typing import Optional, List
-from fastapi import APIRouter, Body, status
+from fastapi import APIRouter, Body, status, Security
 from fastapi.exceptions import HTTPException
 from fastapi.params import Depends
 from fastapi.encoders import jsonable_encoder
@@ -7,7 +7,7 @@ from motor.motor_asyncio import AsyncIOMotorCollection, AsyncIOMotorDatabase
 from pymongo import ReturnDocument
 
 from app.database import getDB
-from app.schemas import postSchema as ps, bson
+from app.schemas import postSchema as ps, bsonUtil as bson, userSchema as us
 from app import oauth2
 
 router = APIRouter(
@@ -17,7 +17,9 @@ router = APIRouter(
 
 
 @router.get("/", response_model=List[ps.PostModel], status_code=status.HTTP_200_OK , response_description="Get all posts")
-async def getAllPosts(db: AsyncIOMotorDatabase = Depends(getDB), currentUser: int = Depends(oauth2.getCurrentUser)):
+# async def getAllPosts(db: AsyncIOMotorDatabase = Depends(getDB), currentUser: int = Depends(oauth2_1.getCurrentUser)):
+async def getAllPosts(db: AsyncIOMotorDatabase = Depends(getDB), currentUser: us.UserCreateModel = Security(oauth2.getCurrentUser, scopes=["admin"])):
+    print(currentUser)
     posts = await db.posts.find().to_list(length=None)
     return posts
 

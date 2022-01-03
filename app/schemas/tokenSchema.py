@@ -1,5 +1,5 @@
-from typing import Optional
-from pydantic import BaseModel, EmailStr
+from typing import Optional, List
+from pydantic import BaseModel, EmailStr, ValidationError
 
 
 class Token(BaseModel):
@@ -8,3 +8,4 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     id: Optional[EmailStr] = None
+    scopes: List[str] = []
