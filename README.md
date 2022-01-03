@@ -28,6 +28,7 @@ Next Steps
 
 
 Primary focus area for v0 [Timeline 3 weeks]
+
     Signup and Login for buyers and shops
     Capability for Shops to add inventory
     Inventory screens
