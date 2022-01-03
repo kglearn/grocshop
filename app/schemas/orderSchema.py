@@ -5,10 +5,11 @@ from enum import Enum
 from bson import ObjectId
 # from app.schemas.bsonUtil import PyObjectId
 # from app.schemas.shopSchema import ShopModel
+# from app.schemas.userSchema import UserResponseModel
 
 from bsonUtil import PyObjectId
 from shopSchema import ShopModel
-
+from userSchema import UserResponseModel
 
 class OrderStatus(str, Enum):
     notProcessed = "notProcessed"
@@ -42,7 +43,6 @@ class OrderItemModel(BaseModel):
                 "total": 236
             }
         }
-
 
 class OrderBaseModel(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
@@ -87,5 +87,44 @@ class OrderBaseModel(BaseModel):
             }
         }
 
+class OrderFullModel(OrderBaseModel):
+    customer: UserResponseModel = Field(...)
+
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId:str}
+        schema_extra = {
+            "example": {
+                "shop": {"addr": "Shop# 5, Anaj Mandi",
+                            "location": "Anaj Mandi",
+                            "city": "Sonepat",
+                            "state": "Haryana",
+                            "owner":{
+                                "name": "Chetan",
+                                "TAN": "ARBIT789TAN999",
+                                "phone": 9876543210,
+                                "email": "chetan@shop.com",
+                            }
+                        },
+                "status": "notProcessed",
+                "items": [
+                    {"item": "Surf Excel 1kg",
+                     "pprice": 200,
+                     "qty": 5,
+                     "gst": 36,
+                     "total": 236
+                    },
+                    {"item": "Tata Tea 1Kg",
+                     "pprice": 120,
+                     "qty": 2,
+                     "gst": 21.6,
+                     "total": 141.6
+                    },
+                ],
+                "billAmt": 377.6
+            }
+        }
+
 if __name__ == "__main__":
-    print(OrderBaseModel.schema_json(indent=5))
+    print(OrderFullModel.schema_json(indent=5))
