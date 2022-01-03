@@ -3,9 +3,11 @@ from pydantic import BaseModel, Field, EmailStr, ValidationError
 from datetime import datetime
 from enum import Enum
 from bson import ObjectId
-from app.schemas.bsonUtil import PyObjectId
-from app.schemas.shopSchema import ShopModel
+# from app.schemas.bsonUtil import PyObjectId
+# from app.schemas.shopSchema import ShopModel
 
+from bsonUtil import PyObjectId
+from shopSchema import ShopModel
 
 
 class OrderStatus(str, Enum):
@@ -33,9 +35,11 @@ class OrderItemModel(BaseModel):
         json_encoders = {ObjectId:str}
         schema_extra = {
             "example": {
-                "title": "post title",
-                "content": "post content",
-                "likes": 5,
+                "item": "Surf Excel 1kg",
+                "pprice": 200,
+                "qty": 5,
+                "gst": 36,
+                "total": 236
             }
         }
 
@@ -53,8 +57,35 @@ class OrderBaseModel(BaseModel):
         json_encoders = {ObjectId:str}
         schema_extra = {
             "example": {
-                "title": "post title",
-                "content": "post content",
-                "likes": 5,
+                "shop": {"addr": "Shop# 5, Anaj Mandi",
+                            "location": "Anaj Mandi",
+                            "city": "Sonepat",
+                            "state": "Haryana",
+                            "owner":{
+                                "name": "Chetan",
+                                "TAN": "ARBIT789TAN999",
+                                "phone": 9876543210,
+                                "email": "chetan@shop.com",
+                            }
+                        },
+                "status": "notProcessed",
+                "items": [
+                    {"item": "Surf Excel 1kg",
+                     "pprice": 200,
+                     "qty": 5,
+                     "gst": 36,
+                     "total": 236
+                    },
+                    {"item": "Tata Tea 1Kg",
+                     "pprice": 120,
+                     "qty": 2,
+                     "gst": 21.6,
+                     "total": 141.6
+                    },
+                ],
+                "billAmt": 377.6
             }
         }
+
+if __name__ == "__main__":
+    print(OrderBaseModel.schema_json(indent=5))

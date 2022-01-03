@@ -1,14 +1,11 @@
 from typing import Optional
 from pydantic import BaseModel, Field, EmailStr
 from bson import ObjectId
-from app.schemas.bsonUtil import PyObjectId
-
+# from app.schemas.bsonUtil import PyObjectId
+from bsonUtil import PyObjectId
 
 class OwnerModel(BaseModel):
     name: str = Field(...)
-    TAN: str = Field(...)
-    phone: int = Field(...)
-    email: EmailStr = Field(...)
 
     class Config:
         allow_population_by_field_name = True
@@ -16,18 +13,12 @@ class OwnerModel(BaseModel):
         json_encoders = {ObjectId:str}
         schema_extra = {
             "example": {
-                "name": "Chetan",
-                "TAN": "ARBIT789TAN999",
-                "phone": 9876543210,
-                "email": "chetan@shop.com",
+                "name": "Chetan"
             }
         }
 
 class UpdateOwnerModel(BaseModel):
     name: Optional[str] 
-    TAN: Optional[str]
-    phone: Optional[int]
-    email: Optional[EmailStr] 
 
     class Config:
         allow_population_by_field_name = True
@@ -35,10 +26,7 @@ class UpdateOwnerModel(BaseModel):
         json_encoders = {ObjectId:str}
         schema_extra = {
             "example": {
-                "name": "Chetan",
-                "TAN": "ARBIT789TAN999",
-                "phone": 9876543210,
-                "email": "chetan@shop.com",
+                "name": "Chetan"
             }
         }
 
@@ -49,6 +37,9 @@ class ShopModel(BaseModel):
     location: str = Field(...)
     city: str = Field(...)
     state: str = Field(...) 
+    gstin: str = Field(...)
+    phone: int = Field(...)
+    email: EmailStr = Field(...)
     owner: OwnerModel = Field(...)
 
     class Config:
@@ -61,11 +52,11 @@ class ShopModel(BaseModel):
                 "location": "Anaj Mandi",
                 "city": "Sonepat",
                 "state": "Haryana",
+                "gstin": "ARBIT789TAN999",
+                "phone": 9876543210,
+                "email": "chetan@shop.com",
                 "owner":{
-                    "name": "Chetan",
-                    "TAN": "ARBIT789TAN999",
-                    "phone": 9876543210,
-                    "email": "chetan@shop.com",
+                    "name": "Chetan"
                 }
             }
         }
@@ -76,6 +67,9 @@ class UpdateShopModel(BaseModel):
     location: Optional[str] 
     city: Optional[str] 
     state: Optional[str]
+    gstin: Optional[str]
+    phone: Optional[int]
+    email: Optional[EmailStr] 
     owner: Optional[UpdateOwnerModel] 
 
     class Config:
@@ -87,12 +81,14 @@ class UpdateShopModel(BaseModel):
                 "location": "Anaj Mandi",
                 "city": "Sonepat",
                 "state": "Haryana",
+                "gstin": "ARBIT789TAN999",
+                "phone": 9876543210,
+                "email": "chetan@shop.com",
                 "owner":{
-                    "name": "Chetan",
-                    "TAN": "ARBIT789TAN999",
-                    "phone": 9876543210,
-                    "email": "chetan@shop.com",
+                    "name": "Chetan"
                 }
             }
         }
 
+if __name__ == "__main__":
+    print(ShopModel.schema_json(indent=5))

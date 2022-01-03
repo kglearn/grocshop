@@ -2,8 +2,6 @@ from typing import Optional, List
 from pydantic import BaseModel, Field, EmailStr, ValidationError
 from datetime import datetime
 from enum import Enum
-from bson import ObjectId
-from app.schemas.bsonUtil import PyObjectId
 
 class UserType(str, Enum):
     admin = "admin"

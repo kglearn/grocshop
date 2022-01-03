@@ -5,3 +5,4 @@ app/routers/__pycache__
 app/schemas/__pycache__
 app/*/*bkp
 app/*bkp
+schema.json
