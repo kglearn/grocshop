@@ -48,6 +48,7 @@ class OrderItemModel(BaseModel):
 class OrderBaseModel(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     shop: ShopBaseModel = Field(...)
+    customer: UserBaseModel = Field(...)
     status: OrderStatus = Field(...)
     items: List[OrderItemModel] = Field(...)
     billAmt: float = Field(...)

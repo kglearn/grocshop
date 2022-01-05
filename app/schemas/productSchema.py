@@ -11,8 +11,9 @@ from app.schemas.shopSchema import ShopBaseModel
 # from userSchema import UserResponseModel
 
 class ProductStatus(str, Enum):
-    active = "active"
     discontinued = "discontinued"
+    outOfStock = "outOfStock"
+    inStock = "inStock"
 
 class CatalogBaseModel(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
