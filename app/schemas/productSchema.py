@@ -1,11 +1,10 @@
 from typing import Optional, List
-from pydantic import BaseModel, Field, EmailStr, ValidationError
+from pydantic import BaseModel, Field
 from datetime import datetime
 from enum import Enum
 from bson import ObjectId
 from app.schemas.bsonUtil import PyObjectId
 from app.schemas.shopSchema import ShopBaseModel
-from app.schemas.userSchema import UserResponseModel
 
 # from bsonUtil import PyObjectId
 # from shopSchema import ShopModel
