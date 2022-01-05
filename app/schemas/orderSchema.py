@@ -3,13 +3,14 @@ from pydantic import BaseModel, Field, EmailStr, ValidationError
 from datetime import datetime
 from enum import Enum
 from bson import ObjectId
-# from app.schemas.bsonUtil import PyObjectId
-# from app.schemas.shopSchema import ShopModel
-# from app.schemas.userSchema import UserResponseModel
+from app.schemas.bsonUtil import PyObjectId
+from app.schemas.shopSchema import ShopBaseModel
+from app.schemas.userSchema import UserBaseModel
+from app.schemas.productSchema import ProductResponseModel
 
-from bsonUtil import PyObjectId
-from shopSchema import ShopModel
-from userSchema import UserResponseModel
+# from bsonUtil import PyObjectId
+# from shopSchema import ShopModel
+# from userSchema import UserResponseModel
 
 class OrderStatus(str, Enum):
     notProcessed = "notProcessed"
@@ -24,7 +25,7 @@ class OrderStatus(str, Enum):
 
 class OrderItemModel(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
-    item: str = Field(...)
+    product: ProductResponseModel = Field(...)
     pprice: float = Field(...)
     qty: float = Field(...)
     gst: float = Field(...)
@@ -46,9 +47,9 @@ class OrderItemModel(BaseModel):
 
 class OrderBaseModel(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
-    shop: ShopModel = Field(...)
+    shop: ShopBaseModel = Field(...)
     status: OrderStatus = Field(...)
-    items: List[OrderItemModel]
+    items: List[OrderItemModel] = Field(...)
     billAmt: float = Field(...)
 
     class Config:
@@ -87,8 +88,18 @@ class OrderBaseModel(BaseModel):
             }
         }
 
-class OrderFullModel(OrderBaseModel):
-    customer: UserResponseModel = Field(...)
+class OrderResponseModel(OrderBaseModel):
+    createdAt: datetime = Field(...)
+    lastUpdatedAt: datetime = Field(...)
+
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId:str}
+
+
+class BillModel(OrderBaseModel):
+    customer: UserBaseModel = Field(...)
 
     class Config:
         allow_population_by_field_name = True
@@ -127,4 +138,4 @@ class OrderFullModel(OrderBaseModel):
         }
 
 if __name__ == "__main__":
-    print(OrderFullModel.schema_json(indent=5))
+    print(BillModel.schema_json(indent=5))

@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from app.database import getDB
-from app.routers import  post, user, auth, shop
+from app.routers import user, auth, shop, post
 
 app = FastAPI()
 

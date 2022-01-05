@@ -1,8 +1,9 @@
+from datetime import datetime
 from typing import Optional
 from pydantic import BaseModel, Field, EmailStr
 from bson import ObjectId
-# from app.schemas.bsonUtil import PyObjectId
-from bsonUtil import PyObjectId
+from app.schemas.bsonUtil import PyObjectId
+# from bsonUtil import PyObjectId
 
 class OwnerModel(BaseModel):
     name: str = Field(...)
@@ -17,7 +18,7 @@ class OwnerModel(BaseModel):
             }
         }
 
-class UpdateOwnerModel(BaseModel):
+class OwnerUpdateModel(BaseModel):
     name: Optional[str] 
 
     class Config:
@@ -31,7 +32,7 @@ class UpdateOwnerModel(BaseModel):
         }
 
 
-class ShopModel(BaseModel):
+class ShopBaseModel(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     addr: str = Field(...)
     location: str = Field(...)
@@ -61,8 +62,17 @@ class ShopModel(BaseModel):
             }
         }
 
+class ShopResponseModel(ShopBaseModel):
+    createdAt: datetime = Field(...)
+    lastUpdatedAt: datetime = Field(...)
 
-class UpdateShopModel(BaseModel):
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId:str}
+
+
+class ShopUpdateModel(BaseModel):
     addr: Optional[str] 
     location: Optional[str] 
     city: Optional[str] 
@@ -70,7 +80,7 @@ class UpdateShopModel(BaseModel):
     gstin: Optional[str]
     phone: Optional[int]
     email: Optional[EmailStr] 
-    owner: Optional[UpdateOwnerModel] 
+    owner: Optional[OwnerUpdateModel] 
 
     class Config:
         arbitrary_types_allowed = True
@@ -90,5 +100,5 @@ class UpdateShopModel(BaseModel):
             }
         }
 
-if __name__ == "__main__":
-    print(ShopModel.schema_json(indent=5))
+# if __name__ == "__main__":
+#     print(ShopModel.schema_json(indent=5))

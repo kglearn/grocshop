@@ -7,6 +7,7 @@ from motor.motor_asyncio import AsyncIOMotorDatabase
 from pymongo import ReturnDocument
 from pymongo.errors import DuplicateKeyError
 from datetime import datetime
+import traceback 
 
 from app.database import getDB
 from app.schemas import userSchema as us
@@ -46,12 +47,17 @@ async def createUser(user: us.UserCreateModel = Body(...), db: AsyncIOMotorDatab
     createdUser = await db.users.find_one({"_id": newUser.inserted_id})
     return createdUser
 
-@router.put("/{id}", response_model=us.UserResponseModel, status_code=status.HTTP_200_OK, response_description="Update User")
-async def updateUserById(user: us.UserCreateModel = Body(...), db: AsyncIOMotorDatabase = Depends(getDB)):
-    print(user.dict())
-    updatedUser = await db.users.find_one_and_update({"_id": user.id}, {"$set": {"password": user.password}}, return_document=ReturnDocument.AFTER)    
+@router.put("/", response_model=us.UserResponseModel, status_code=status.HTTP_200_OK, response_description="Update User")
+async def updateUserById(user: us.UserUpdateModel = Body(...), db: AsyncIOMotorDatabase = Depends(getDB)):
+    if user.password:
+        user.password = utils.hashPasswd(user.password)
+    user = {k:v for k,v in user.dict().items() if v is not None}
+    userId = user.pop('id')
+    user["lastUpdatedAt"] = datetime.now()
+    updatedUser = await db.users.find_one_and_update({"_id": userId}, {"$set": {**user}}, return_document=ReturnDocument.AFTER)    
     if not updatedUser:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"User with id {id} not found")
+
     return updatedUser
 
 @router.delete("/{id}", response_model=us.UserResponseModel, status_code=status.HTTP_200_OK, response_description="Update User")
