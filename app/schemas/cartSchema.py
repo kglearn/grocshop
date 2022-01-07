@@ -4,8 +4,8 @@ from datetime import datetime
 from enum import Enum
 from bson import ObjectId
 from app.schemas.bsonUtil import PyObjectId
-from app.schemas.userSchema import UserResponseModel
-from app.schemas.productSchema import ProductResponseModel, ProductStatus
+from app.schemas.userSchema import UserBaseModel
+from app.schemas.productSchema import ProductBaseModel, ProductStatus
 
 # from bsonUtil import PyObjectId
 # from shopSchema import ShopModel
@@ -13,15 +13,19 @@ from app.schemas.productSchema import ProductResponseModel, ProductStatus
 
 class CartItemModel(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
-    product: ProductResponseModel = Field(...)
+    productName: str = Field(...)
     price: float = Field(...)
     qty: float = Field(...)
-    gst: float = Field(...)
     total: float = Field(...)
+    
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId:str}
 
 class CartBaseModel(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
-    customer: UserResponseModel = Field(...)
+    customer: UserBaseModel = Field(...)
     items: List[CartItemModel] = Field(...)
     
 
@@ -41,10 +45,21 @@ class CartResponseModel(CartBaseModel):
         json_encoders = {ObjectId:str}
 
 
-class CartUpdateModel(BaseModel):
+class CartItemUpdateModel(BaseModel):
     cartItemId: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
-    qty: Optional[int] 
-    status: Optional[ProductStatus] 
+    qty: int 
+    # status: Optional[ProductStatus] 
+
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        schema_extra = {
+            "example": {
+            }
+        }
+
+class CartItemDeleteModel(BaseModel):
+    cartItemId: List[PyObjectId] 
 
     class Config:
         allow_population_by_field_name = True
