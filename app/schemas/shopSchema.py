@@ -72,6 +72,29 @@ class ShopUpdateModel(BaseModel):
     owner: Optional[OwnerModel] 
 
     class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
+        schema_extra = {
+            "example": {
+                "addr": "Shop# 5, Anaj Mandi",
+                "location": "Anaj Mandi",
+                "city": "Sonepat",
+                "state": "Haryana",
+                "gstin": "ARBIT789TAN999",
+                "phone": 9876543210,
+                "email": "chetan@shop.com",
+                "owner":{
+                    "name": "Chetan"
+                }
+            }
+        }
+
+class ShopProductEmbedModel(ShopUpdateModel):
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+
+    class Config:
+        allow_population_by_field_name = True
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
         schema_extra = {

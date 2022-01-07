@@ -4,7 +4,7 @@ from datetime import datetime
 from enum import Enum
 from bson import ObjectId
 from app.schemas.bsonUtil import PyObjectId
-from app.schemas.shopSchema import ShopBaseModel
+from app.schemas.shopSchema import ShopBaseModel, ShopProductEmbedModel
 
 # from bsonUtil import PyObjectId
 # from shopSchema import ShopModel
@@ -72,12 +72,13 @@ class ProductUpdateModel(BaseModel):
     discount: Optional[float]
     avlQty: Optional[float] 
     status: Optional[ProductStatus] 
-    shop: Optional[ShopBaseModel] 
+    shop: Optional[ShopProductEmbedModel] 
     
 
     class Config:
         allow_population_by_field_name = True
         arbitrary_types_allowed = True
+        use_enum_values = True
         schema_extra = {
             "example": {
             }

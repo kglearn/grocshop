@@ -20,15 +20,16 @@ router = APIRouter(
 @router.get("/", response_model=List[ps.ProductResponseModel], status_code=status.HTTP_200_OK , response_description="Get all Products")
 # async def getAllshops(db: AsyncIOMotorDatabase = Depends(getDB), currentUser: int = Depends(oauth2.getCurrentUser)):
 async def getAllshops(db: AsyncIOMotorDatabase = Depends(getDB), currentUser: int = Security(oauth2.getCurrentUser, scopes=["admin", "shopOwner", "shopAdmin"])):
-    shops = await db.shops.find().to_list(length=None)
-    return shops
+    products = await db.products.find().to_list(length=None)
+    return products
 
 @router.get("/{id}", response_model=ps.ProductResponseModel, status_code=status.HTTP_200_OK , response_description="Get Product by Id")
 async def getShopById(id: bson.PyObjectId, db: AsyncIOMotorDatabase = Depends(getDB), currentUser: int = Security(oauth2.getCurrentUser, scopes=["admin", "shopOwner", "shopAdmin"])):
     print(id, type(id))
-    if (shop := await db.shops.find_one({"_id": id})) is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Shop with id {id} not found")
-    return shop
+    if (product := await db.products.find_one({"_id": id})) is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Product with id {id} not found")
+    print(product)
+    return product
 
 @router.post("/", response_model=ps.ProductResponseModel, status_code=status.HTTP_201_CREATED , response_description="Create a Product")
 async def createProduct(product: ps.ProductBaseModel = Body(...), db: AsyncIOMotorDatabase = Depends(getDB), currentUser: int = Security(oauth2.getCurrentUser, scopes=["admin", "shopOwner", "shopAdmin"])):
@@ -43,21 +44,29 @@ async def createProduct(product: ps.ProductBaseModel = Body(...), db: AsyncIOMot
 
 @router.put("/{id}", response_model=ps.ProductResponseModel, status_code=status.HTTP_200_OK, response_description="Update Product")
 async def updateProductById(id: bson.PyObjectId, product: ps.ProductUpdateModel = Body(...), db: AsyncIOMotorDatabase = Depends(getDB), currentUser: int = Security(oauth2.getCurrentUser, scopes=["admin", "shopOwner", "shopAdmin"])):
-    shop = {k:v for k,v in product.dict().items() if v is not None}
-    shop["owner"] = {k: v for k, v in shop["owner"].items() if v is not None}
-    for k,v in shop["owner"].items():
-        shop[f"owner.{k}"] = v  
-    shop.pop("owner")
-    shop["lastUpdatedAt"] = datetime.now()
+    product = {k:v for k,v in product.dict().items() if v is not None}
+    if "shop" in product.keys():
+        product["shop"] = {k: v for k, v in product["shop"].items() if v is not None}
 
-    updatedShop = await db.shops.find_one_and_update({"_id": id}, {"$set": {**shop}}, return_document=ReturnDocument.AFTER)    
-    if not updatedShop:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Shop with id {id} not found")
-    return updatedShop
+        for k,v in product["shop"].items():
+            product[f"shop.{k}"] = v  
+
+        if "owner" in product["shop"].keys():
+            for k,v in product["shop"]["owner"].items():
+                product[f"shop.owner.{k}"] = v  
+            product.pop("shop.owner")
+        product.pop("shop")
+
+    product["lastUpdatedAt"] = datetime.now()
+    
+    updatedProduct = await db.products.find_one_and_update({"_id": id}, {"$set": {**product}}, return_document=ReturnDocument.AFTER)    
+    if not updatedProduct:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Product with id {id} not found")
+    return updatedProduct
 
 @router.delete("/{id}", response_model=ps.ProductResponseModel, status_code=status.HTTP_200_OK, response_description="Delete Product")
 async def deleteShopById(id: bson.PyObjectId, db: AsyncIOMotorDatabase=Depends(getDB), currentUser: int = Security(oauth2.getCurrentUser, scopes=["admin"])):
-    deletedShop = await db.shops.find_one_and_delete({"_id": id})    
-    if not deletedShop:    
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Shop with id {id} not found")
-    return deletedShop
+    deletedProduct = await db.products.find_one_and_delete({"_id": id})    
+    if not deletedProduct:    
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Product with id {id} not found")
+    return deletedProduct

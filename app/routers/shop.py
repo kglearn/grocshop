@@ -43,13 +43,13 @@ async def createshop(shop: ss.ShopBaseModel = Body(...), db: AsyncIOMotorDatabas
 
 @router.put("/{id}", response_model=ss.ShopResponseModel, status_code=status.HTTP_200_OK, response_description="Update Shop")
 async def updateShopById(id: bson.PyObjectId, shop: ss.ShopUpdateModel = Body(...), db: AsyncIOMotorDatabase = Depends(getDB), currentUser: int = Security(oauth2.getCurrentUser, scopes=["admin", "shopOwner", "shopAdmin"])):
-    print(shop)
     shop = {k:v for k,v in shop.dict().items() if v is not None}
-    print(shop)
-    shop["owner"] = {k: v for k, v in shop["owner"].items() if v is not None}
-    for k,v in shop["owner"].items():
-        shop[f"owner.{k}"] = v  
-    shop.pop("owner")
+    
+    if "owner" in shop.keys():
+        shop["owner"] = {k: v for k, v in shop["owner"].items() if v is not None}
+        for k,v in shop["owner"].items():
+            shop[f"owner.{k}"] = v  
+        shop.pop("owner")
     shop["lastUpdatedAt"] = datetime.now()
 
     updatedShop = await db.shops.find_one_and_update({"_id": id}, {"$set": {**shop}}, return_document=ReturnDocument.AFTER)    
