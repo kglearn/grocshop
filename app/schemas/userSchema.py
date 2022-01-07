@@ -19,7 +19,7 @@ class UserBaseModel(BaseModel):
     location: str = Field(...)
     state: str = Field(...)
     phone: int = Field(...)
-    orderHistory: Optional[List[OrderResponseModel]] = Field(...)
+    
 
     class Config:
         allow_population_by_field_name = True
@@ -32,6 +32,7 @@ class UserBaseModel(BaseModel):
         }
 
 class UserResponseModel(UserBaseModel):
+    orderHistory: Optional[List[OrderResponseModel]] = None
     createdAt: datetime  = Field(...)
     lastUpdatedAt: datetime = Field(...)
 
@@ -70,7 +71,7 @@ class UserCreateModel(UserBaseModel):
         }
 
 
-class UserUpdateModel(BaseModel):
+class UserUpdateModel(UserBaseModel):
     addr: Optional[str] 
     city: Optional[str] 
     location: Optional[str] 
@@ -85,14 +86,15 @@ class UserUpdateModel(BaseModel):
             "example": {
                 "id": "a@b.c",
                 "location": "Block1",
-                "password":"abc"
+                "password":"abc",
+                "type": "shopOwner"
             }
         }
 
 
 from app.schemas.orderSchema import OrderResponseModel
 UserBaseModel.update_forward_refs()
-
+UserResponseModel.update_forward_refs()
 
 if __name__ == "__main__":
     print(UserCreateModel.schema_json(indent=2))

@@ -8,44 +8,42 @@ from pymongo import ReturnDocument
 from datetime import datetime
 
 from app.database import getDB
-from app.schemas import shopSchema as ss, bsonUtil as bson
+from app.schemas import productSchema as ps, bsonUtil as bson
 from app import oauth2
 
 router = APIRouter(
-    prefix = "/shops",
-    tags = ["Shops"]
+    prefix = "/products",
+    tags = ["Products"]
 )
 
 
-@router.get("/", response_model=List[ss.ShopResponseModel], status_code=status.HTTP_200_OK , response_description="Get all shops")
+@router.get("/", response_model=List[ps.ProductResponseModel], status_code=status.HTTP_200_OK , response_description="Get all Products")
 # async def getAllshops(db: AsyncIOMotorDatabase = Depends(getDB), currentUser: int = Depends(oauth2.getCurrentUser)):
 async def getAllshops(db: AsyncIOMotorDatabase = Depends(getDB), currentUser: int = Security(oauth2.getCurrentUser, scopes=["admin", "shopOwner", "shopAdmin"])):
     shops = await db.shops.find().to_list(length=None)
     return shops
 
-@router.get("/{id}", response_model=ss.ShopResponseModel, status_code=status.HTTP_200_OK , response_description="Get Shops by Id")
+@router.get("/{id}", response_model=ps.ProductResponseModel, status_code=status.HTTP_200_OK , response_description="Get Product by Id")
 async def getShopById(id: bson.PyObjectId, db: AsyncIOMotorDatabase = Depends(getDB), currentUser: int = Security(oauth2.getCurrentUser, scopes=["admin", "shopOwner", "shopAdmin"])):
     print(id, type(id))
     if (shop := await db.shops.find_one({"_id": id})) is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Shop with id {id} not found")
     return shop
 
-@router.post("/", response_model=ss.ShopResponseModel, status_code=status.HTTP_201_CREATED , response_description="Create a Shop")
-async def createshop(shop: ss.ShopBaseModel = Body(...), db: AsyncIOMotorDatabase = Depends(getDB), currentUser: int = Security(oauth2.getCurrentUser, scopes=["admin", "shopOwner", "shopAdmin"])):
-    shop = jsonable_encoder(shop)
-    shop["_id"] = bson.PyObjectId(shop["_id"])
-    shop["createdAt"] = datetime.now()
-    shop["lastUpdatedAt"] = shop["createdAt"]
+@router.post("/", response_model=ps.ProductResponseModel, status_code=status.HTTP_201_CREATED , response_description="Create a Product")
+async def createProduct(product: ps.ProductBaseModel = Body(...), db: AsyncIOMotorDatabase = Depends(getDB), currentUser: int = Security(oauth2.getCurrentUser, scopes=["admin", "shopOwner", "shopAdmin"])):
+    product = jsonable_encoder(product)
+    product["_id"] = bson.PyObjectId(product["_id"])
+    product["createdAt"] = datetime.now()
+    product["lastUpdatedAt"] = datetime.now()
 
-    newShop = await db.shops.insert_one(shop)
-    createdShop = await db.shops.find_one({"_id": newShop.inserted_id})
-    return createdShop
+    newProduct = await db.products.insert_one(product)
+    createdProduct = await db.products.find_one({"_id": newProduct.inserted_id})
+    return createdProduct
 
-@router.put("/{id}", response_model=ss.ShopResponseModel, status_code=status.HTTP_200_OK, response_description="Update Shop")
-async def updateShopById(id: bson.PyObjectId, shop: ss.ShopUpdateModel = Body(...), db: AsyncIOMotorDatabase = Depends(getDB), currentUser: int = Security(oauth2.getCurrentUser, scopes=["admin", "shopOwner", "shopAdmin"])):
-    print(shop)
-    shop = {k:v for k,v in shop.dict().items() if v is not None}
-    print(shop)
+@router.put("/{id}", response_model=ps.ProductResponseModel, status_code=status.HTTP_200_OK, response_description="Update Product")
+async def updateProductById(id: bson.PyObjectId, product: ps.ProductUpdateModel = Body(...), db: AsyncIOMotorDatabase = Depends(getDB), currentUser: int = Security(oauth2.getCurrentUser, scopes=["admin", "shopOwner", "shopAdmin"])):
+    shop = {k:v for k,v in product.dict().items() if v is not None}
     shop["owner"] = {k: v for k, v in shop["owner"].items() if v is not None}
     for k,v in shop["owner"].items():
         shop[f"owner.{k}"] = v  
@@ -57,7 +55,7 @@ async def updateShopById(id: bson.PyObjectId, shop: ss.ShopUpdateModel = Body(..
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Shop with id {id} not found")
     return updatedShop
 
-@router.delete("/{id}", response_model=ss.ShopResponseModel, status_code=status.HTTP_200_OK, response_description="Delete Shop")
+@router.delete("/{id}", response_model=ps.ProductResponseModel, status_code=status.HTTP_200_OK, response_description="Delete Product")
 async def deleteShopById(id: bson.PyObjectId, db: AsyncIOMotorDatabase=Depends(getDB), currentUser: int = Security(oauth2.getCurrentUser, scopes=["admin"])):
     deletedShop = await db.shops.find_one_and_delete({"_id": id})    
     if not deletedShop:    

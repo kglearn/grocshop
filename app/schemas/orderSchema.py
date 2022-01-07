@@ -14,6 +14,7 @@ from app.schemas.productSchema import ProductResponseModel
 
 class OrderStatus(str, Enum):
     notProcessed = "notProcessed"
+    approved = "approved"
     inProcess = "inProcess"
     processed = "processed"
     shipped = "shipped"

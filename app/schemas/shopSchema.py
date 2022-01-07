@@ -18,22 +18,10 @@ class OwnerModel(BaseModel):
             }
         }
 
-class OwnerUpdateModel(BaseModel):
-    name: Optional[str] 
-
-    class Config:
-        allow_population_by_field_name = True
-        arbitrary_types_allowed = True
-        json_encoders = {ObjectId:str}
-        schema_extra = {
-            "example": {
-                "name": "Chetan"
-            }
-        }
-
 
 class ShopBaseModel(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+    shopName: str =Field(...)
     addr: str = Field(...)
     location: str = Field(...)
     city: str = Field(...)
@@ -73,6 +61,7 @@ class ShopResponseModel(ShopBaseModel):
 
 
 class ShopUpdateModel(BaseModel):
+    shopName: Optional[str]
     addr: Optional[str] 
     location: Optional[str] 
     city: Optional[str] 
@@ -80,7 +69,7 @@ class ShopUpdateModel(BaseModel):
     gstin: Optional[str]
     phone: Optional[int]
     email: Optional[EmailStr] 
-    owner: Optional[OwnerUpdateModel] 
+    owner: Optional[OwnerModel] 
 
     class Config:
         arbitrary_types_allowed = True

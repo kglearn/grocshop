@@ -32,6 +32,7 @@ async def getPostById(id: bson.PyObjectId, db: AsyncIOMotorDatabase = Depends(ge
 @router.post("/", response_model=ps.PostModel, status_code=status.HTTP_201_CREATED , response_description="Create a post")
 async def createPost(post: ps.PostModel = Body(...), db: AsyncIOMotorDatabase = Depends(getDB)):
     post = jsonable_encoder(post)
+    print(post)
     newPost = await db.posts.insert_one(post)
     createdPost = await db.posts.find_one({"_id": newPost.inserted_id})
     return createdPost

@@ -31,10 +31,10 @@ class CatalogBaseModel(BaseModel):
 class ProductBaseModel(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     productName: str = Field(...)
-    ctgname : str = Field(...)
+    ctgName : str = Field(...)
     category : str = Field(...)
-    pprice: float = Field(...)
-    sprice: float = Field(...)
+    pprice: float = Field(...) # Purchase price for shop
+    sprice: float = Field(...) # Selling price fixed by shop
     discount: float = Field(...)
     avlQty: float = Field(...)
     status: ProductStatus = Field(...)

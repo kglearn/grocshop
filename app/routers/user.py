@@ -38,6 +38,7 @@ async def getUserById(id: str, db: AsyncIOMotorDatabase = Depends(getDB)):
 async def createUser(user: us.UserCreateModel = Body(...), db: AsyncIOMotorDatabase = Depends(getDB)):
     user = jsonable_encoder(user)
     user["createdAt"] = datetime.now()
+    user["lastUpdatedAt"] = user["createdAt"]
     user["password"] = utils.hashPasswd(user["password"])
     try:
         newUser = await db.users.insert_one(user)
@@ -66,3 +67,4 @@ async def deleteUserById(id: str, db: AsyncIOMotorDatabase = Depends(getDB)):
     if not deletedUser:    
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"User with id {id} not found")
     return deletedUser
+
