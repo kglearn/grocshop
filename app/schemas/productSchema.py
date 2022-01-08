@@ -50,6 +50,7 @@ class ProductBaseModel(BaseModel):
             }
         }
 
+
 class ProductResponseModel(ProductBaseModel):
     createdAt: datetime = Field(...)
     lastUpdatedAt: datetime = Field(...)

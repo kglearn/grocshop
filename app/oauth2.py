@@ -63,7 +63,7 @@ async def getCurrentUser(securityScope: SecurityScopes, token: str = Depends(oau
     )
     credentials_exception = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=f"Invalid credentials", headers={"WWW-Authenticate": "Bearer"})
     tokenData = await verifyAccessToken(token, credentials_exception)
-    print(tokenData)
+
     if (user := await db.users.find_one({"_id": tokenData.id})) is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"User with id {token.id} not found")
 

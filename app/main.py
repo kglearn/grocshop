@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from app.database import getDB
-from app.routers import user, auth, shop, product, post, cart
+from app.routers import user, auth, shop, product, post, cart, order
 
 app = FastAPI()
 
@@ -10,5 +10,6 @@ app.include_router(user.router)
 app.include_router(shop.router)
 app.include_router(product.router)
 app.include_router(cart.router)
+app.include_router(order.router)
 
 

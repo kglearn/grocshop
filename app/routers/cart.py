@@ -31,11 +31,8 @@ async def getCartById(id: bson.PyObjectId, db: AsyncIOMotorDatabase = Depends(ge
 
 @router.post("/", response_model=cs.CartResponseModel, status_code=status.HTTP_201_CREATED , response_description="Create a Cart")
 async def createCart(cart: cs.CartBaseModel = Body(...), db: AsyncIOMotorDatabase = Depends(getDB), currentUser: int = Security(oauth2.getCurrentUser, scopes=["admin", "shopOwner", "shopAdmin"])):
-    print("1 ->>> ", cart)
     cart = jsonable_encoder(cart)
-    print("2 ->>> ", cart)
     cart["_id"] = bson.PyObjectId(cart["_id"])
-    print("3 ->>", cart["items"])
     for idx, item in enumerate(cart["items"]):
         cart["items"][idx]["_id"] = bson.PyObjectId(item["_id"])
     cart["createdAt"] = datetime.now()

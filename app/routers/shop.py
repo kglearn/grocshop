@@ -25,7 +25,6 @@ async def getAllshops(db: AsyncIOMotorDatabase = Depends(getDB), currentUser: in
 
 @router.get("/{id}", response_model=ss.ShopResponseModel, status_code=status.HTTP_200_OK , response_description="Get Shops by Id")
 async def getShopById(id: bson.PyObjectId, db: AsyncIOMotorDatabase = Depends(getDB), currentUser: int = Security(oauth2.getCurrentUser, scopes=["admin", "shopOwner", "shopAdmin"])):
-    print(id, type(id))
     if (shop := await db.shops.find_one({"_id": id})) is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Shop with id {id} not found")
     return shop

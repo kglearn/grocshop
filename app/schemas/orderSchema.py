@@ -6,7 +6,6 @@ from bson import ObjectId
 from app.schemas.bsonUtil import PyObjectId
 from app.schemas.shopSchema import ShopBaseModel
 from app.schemas.userSchema import UserBaseModel
-from app.schemas.productSchema import ProductResponseModel
 
 # from bsonUtil import PyObjectId
 # from shopSchema import ShopModel
@@ -26,10 +25,13 @@ class OrderStatus(str, Enum):
 
 class OrderItemModel(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
-    product: ProductResponseModel = Field(...)
-    pprice: float = Field(...)
+    productName: str = Field(...)
+    ctgName : str = Field(...)
+    category : str = Field(...)
+    sprice: float = Field(...) # Selling price fixed by shop
+    discount: float = Field(...)
     qty: float = Field(...)
-    gst: float = Field(...)
+    # gst: float = Field(...)
     total: float = Field(...)
 
     class Config:
@@ -99,6 +101,22 @@ class OrderResponseModel(OrderBaseModel):
         arbitrary_types_allowed = True
         json_encoders = {ObjectId:str}
 
+class OrderUpdateDiscountModel(BaseModel):
+    productId: PyObjectId
+    discount: Optional[int]
+
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId:str}
+
+class OrderUpdateStatusModel(BaseModel):
+    status: Optional[OrderStatus]
+
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId:str}
 
 class BillModel(OrderBaseModel):
     customer: UserBaseModel = Field(...)

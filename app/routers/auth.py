@@ -19,7 +19,5 @@ async def login(userCreds: OAuth2PasswordRequestForm = Depends(), db: AsyncIOMot
     if not utils.verifyPasswd(userCreds.password, user["password"]):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=f"Invalid Credentials p")
 
-    print("1 -->", user)
     token = oauth2.createAccessToken(data = {"userId": user["_id"], "scopes": [user["type"]]})
-    print("2 -->", token)
     return {"token": token, "tokenType": "bearer"}
