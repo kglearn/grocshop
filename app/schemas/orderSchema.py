@@ -103,7 +103,7 @@ class OrderResponseModel(OrderBaseModel):
 
 class OrderUpdateDiscountModel(BaseModel):
     productId: PyObjectId
-    discount: Optional[int]
+    discount: int
 
     class Config:
         allow_population_by_field_name = True
@@ -111,7 +111,7 @@ class OrderUpdateDiscountModel(BaseModel):
         json_encoders = {ObjectId:str}
 
 class OrderUpdateStatusModel(BaseModel):
-    status: Optional[OrderStatus]
+    status: OrderStatus
 
     class Config:
         allow_population_by_field_name = True
