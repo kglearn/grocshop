@@ -58,7 +58,11 @@ async def updateCartItemsById(id: bson.PyObjectId, cartUpdate: List[cs.CartItemU
         
 @router.put("/delete/{id}", response_model=cs.CartResponseModel, status_code=status.HTTP_200_OK, response_description="Delete Cart Items")
 async def deleteCartItemsById(id: bson.PyObjectId, cartDelete: cs.CartItemDeleteModel = Body(...), db: AsyncIOMotorDatabase = Depends(getDB), currentUser: int = Security(oauth2.getCurrentUser, scopes=["admin", "shopOwner", "shopAdmin"])):
-    print(cartDelete)
+    for itemId in cartDelete.cartItemId:
+        deletedCart = await db.carts.update_one({"_id": id}, {"$pull":{"items": {"_id": itemId} }})
+
+    deletedCart = await db.carts.find_one({"_id": id})
+    return deletedCart
 
 @router.delete("/{id}", response_model=cs.CartResponseModel, status_code=status.HTTP_200_OK, response_description="Delete Cart")
 async def deleteCartById(id: bson.PyObjectId, db: AsyncIOMotorDatabase=Depends(getDB), currentUser: int = Security(oauth2.getCurrentUser, scopes=["admin"])):
